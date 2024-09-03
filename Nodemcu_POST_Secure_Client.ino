@@ -12,8 +12,8 @@
 #include <ArduinoJson.h>
 
 // Variable dan value untuk ssid dan password WiFi
-const char* ssid = "One More Shot";
-const char* password = "Di9i7alNa7i*ns#";
+const char* ssid = "";
+const char* password = "";
 
 // Define variable ip dan url www.reqres.in untuk check ping
 // IPAddress ip (192, 168, 110, 1); 
@@ -45,8 +45,6 @@ void loop() {
   // Mengecek apakah interval waktu telah berlalu
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis; // Memperbarui waktu terakhir request
-
-    // getHttp();
     postHttp();
   }
 }
@@ -86,7 +84,7 @@ void postHttp() {
 
   // create an object
   JsonObject buff = doc.to<JsonObject>();
-  buff["suhu"]=random(20, 35);
+  buff["suhu"]=random(20, 35); // random value
 
   // serializeJson(doc, Serial); // output on the serial monitor
   // serialize the object and send the result to jsonParams
@@ -116,53 +114,6 @@ void postHttp() {
 
     http.end(); // Akhiri koneksi HTTP
   }  else {
-    Serial.println("Wi-Fi not connected");
-  }
-}
-
-// Method GET HTTP DATA
-const char* apiDetailUser = "https://66d6c87a006bfbe2e64e9265.mockapi.io/api/v1/data/1";
-void getHttp() {
-  // Pastikan telah terhubung ke Wi-Fi
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(client, apiDetailUser);
-    
-    int httpCode = http.GET(); // Kirimkan GET request
-
-    // Jika request berhasil (kode HTTP 200)
-    if (httpCode > 0) {
-        Serial.printf("HTTP GET... code: %d\n", httpCode);
-        // Ambil respon dari server
-        if (httpCode == HTTP_CODE_OK) {
-          String response = http.getString();
-          // Serial.print("Response: ");
-          // Serial.println(response); // Menampilkan respon API
-
-          /*
-            GAMBARAN BENTUK RESPONSE SUCCESS
-            {"createdAt":1725352030,"suhu":28,"id":"1"}
-          */
-
-          JsonDocument doc;
-          // convert string to object
-          deserializeJson(doc, response);
-
-          // extract the data
-          JsonObject object = doc.as<JsonObject>();
-          String suhu = object["suhu"];
-          
-          Serial.print("Respnonse: ");
-          Serial.println(response);
-          Serial.println(suhu);
-        }
-      } else {
-        // Jika request gagal
-        Serial.printf("GET request failed, error: %s\n", http.errorToString(httpCode).c_str());
-      }
-
-    http.end(); // Akhiri koneksi HTTP
-  } else {
     Serial.println("Wi-Fi not connected");
   }
 }
